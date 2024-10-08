@@ -1,61 +1,68 @@
-const connection = require('../database/connection');
+const connection = require("../database/connection");
 
 module.exports = {
+  async index(request, response) {
+    logger.info("Request incident profile index");
 
-    async index(request, response){
-        
-        const { page = 1 }  = request.query;
-        
-        const [count] = await connection('incidents').count();
+    const { page = 1 } = request.query;
 
-        const incidents = await connection('incidents')
-        .join('ongs', 'ongs.id', '=', 'incidents.ong_id')
-        .limit(5)
-        .offset((page -1)*5)
-        .select([
-            'incidents.*',
-            'ongs.name',
-            'ongs.email',
-            'ongs.whatsapp',
-            'ongs.city',
-            'ongs.uf'
-        ]);
-        
-        response.header('X-Total-Count', count['count(*)']);
+    const [count] = await connection("incidents").count();
 
-        return response.json(incidents);
-    },
+    const incidents = await connection("incidents")
+      .join("ongs", "ongs.id", "=", "incidents.ong_id")
+      .limit(5)
+      .offset((page - 1) * 5)
+      .select([
+        "incidents.*",
+        "ongs.name",
+        "ongs.email",
+        "ongs.whatsapp",
+        "ongs.city",
+        "ongs.uf",
+      ]);
 
-    async create(request, response){
-        const { title, description, value } = request.body;
+    response.header("X-Total-Count", count["count(*)"]);
+    logger.info("Request proecssada profile index");
 
-        const ong_id = request.headers.authorization;
+    return response.json(incidents);
+  },
 
-        const [id] = await connection('incidents').insert({
-            title,
-            description,
-            value,
-            ong_id,
-        })
+  async create(request, response) {
+    logger.info("Request incident profile create");
 
-        return response.json({ id })
-    },
+    const { title, description, value } = request.body;
 
-    async delete(request, response){
-        const { id } = request.params;
-        const ong_id = request.headers.authorization;
+    const ong_id = request.headers.authorization;
 
-        const incident = await connection('incidents')
-            .where('id', id)
-            .select('ong_id')
-            .first();
+    const [id] = await connection("incidents").insert({
+      title,
+      description,
+      value,
+      ong_id,
+    });
+    logger.info("Request incident processada create");
 
-        if (incident.ong_id !== ong_id){
-            return response.status(401).json({error: 'Operation not permitted.'});
-        }
+    return response.json({ id });
+  },
 
-        await connection('incidents').where('id', id).delete();
+  async delete(request, response) {
+    logger.info("Request incident iniciada delete");
 
-        return response.status(204).send();
+    const { id } = request.params;
+    const ong_id = request.headers.authorization;
+
+    const incident = await connection("incidents")
+      .where("id", id)
+      .select("ong_id")
+      .first();
+
+    if (incident.ong_id !== ong_id) {
+      return response.status(401).json({ error: "Operation not permitted." });
     }
+
+    await connection("incidents").where("id", id).delete();
+    logger.info("Request incident processada delete");
+
+    return response.status(204).send();
+  },
 };

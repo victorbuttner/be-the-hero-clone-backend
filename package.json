@@ -17,7 +17,8 @@
     "express": "^4.17.1",
     "knex": "^0.20.13",
     "newrelic": "^11.19.0",
-    "sqlite3": "^5"
+    "sqlite3": "^5",
+    "winston": "^3.15.0"
   },
   "devDependencies": {
     "jest": "^25.2.4",
