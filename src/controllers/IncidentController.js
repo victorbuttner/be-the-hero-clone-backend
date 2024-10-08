@@ -1,4 +1,5 @@
 const connection = require("../database/connection");
+const logger = require("../utils/logger");
 
 module.exports = {
   async index(request, response) {
